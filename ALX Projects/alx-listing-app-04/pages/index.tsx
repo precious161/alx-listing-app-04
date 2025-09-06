@@ -1,32 +1,27 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import PropertyCard from "@/components/booking/PropertyCard"; // Assume this component exists
+import axios from "axios";
+import PropertyCard from "@/components/property/PropertyCard";
 
-export default function Home() {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
+interface Property {
+  id: number;
+  title: string;
+  imageUrl: string;
+}
+
+export default function HomePage() {
+  const [properties, setProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     const fetchProperties = async () => {
-      try {
-        const response = await axios.get("/api/properties");
-        setProperties(response.data);
-      } catch (error) {
-        console.error("Error fetching properties:", error);
-      } finally {
-        setLoading(false);
-      }
+      const response = await axios.get<Property[]>("/api/properties");
+      setProperties(response.data);
     };
-
     fetchProperties();
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div>
+      <h1>Available Properties</h1>
       {properties.map((property) => (
         <PropertyCard key={property.id} property={property} />
       ))}

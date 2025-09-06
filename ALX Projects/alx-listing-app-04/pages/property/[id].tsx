@@ -1,45 +1,13 @@
 import { useRouter } from "next/router";
-import axios from "axios";
-import { useState, useEffect } from "react";
 import PropertyDetail from "@/components/property/PropertyDetail";
 
-type Property = {
-  id: number;
-  title: string;
-  description: string;
-  location: string;
-  price: number;
-  imageUrl: string;
-};
-
-export default function PropertyDetailPage() {
+export default function PropertyPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  if (!id) return <p>Loading...</p>;
 
-  useEffect(() => {
-    const fetchProperty = async () => {
-      if (!id) return; // wait until the dynamic id is available
-      try {
-        const response = await axios.get(`/api/properties/${id}`);
-        setProperty(response.data);
-      } catch (err) {
-        console.error("Error fetching property details:", err);
-        setError("Failed to load property details.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const propertyId = Array.isArray(id) ? parseInt(id[0], 10) : parseInt(id, 10);
 
-    fetchProperty();
-  }, [id]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
-  if (!property) return <p>Property not found</p>;
-
-  return <PropertyDetail property={property} />;
+  return <PropertyDetail propertyId={propertyId} />;
 }
